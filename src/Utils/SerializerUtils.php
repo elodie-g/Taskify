@@ -8,12 +8,12 @@ use Symfony\Component\Serializer\Serializer;
 
 class SerializerUtils
 {
-    public static function circularReferenceHandler($object)
+    public static function circularReferenceHandler(object $object)
     {
         return $object->getId();
     }
 
-    public static function serializeWithCircularReference($object)
+    public static function serializeWithCircularReference(mixed $object)
     {
         $encoders = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];

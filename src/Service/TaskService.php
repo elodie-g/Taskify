@@ -44,7 +44,7 @@ class TaskService
         return $task;
     }
 
-    public function buildTask(Task $task, $payload)
+    public function buildTask(Task $task, object $payload)
     {
         $task->setLabel($payload->label);
         $task->setDuration($payload->duration);
