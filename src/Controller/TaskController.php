@@ -101,4 +101,25 @@ class TaskController extends AbstractController
             'tasks' => $tasks
         ]);
     }
+
+    /**
+     * @Route("/api/task/{id}", methods={"GET"})
+     */
+    public function getById(int $id): JsonResponse
+    {
+        try {
+            $task = SerializerUtils::serializeWithCircularReference(
+                $this->taskService->getById($id)
+            );
+    
+            return $this->json([
+                'message' => 'Task retrieved from the database',
+                'task' => $task
+            ]);
+        } catch (Exception $e) {
+            return $this->json([
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
 }
