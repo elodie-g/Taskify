@@ -19,6 +19,11 @@ class TaskService
         $this->workerService = new WorkerService($entityManager);
     }
 
+    public function getAll()
+    {
+        return $this->entityManager->getRepository(Task::class)->findAll();
+    }
+
     public function getById(int $id)
     {
         $task = $this->entityManager->getRepository(Task::class)->find($id);

@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
+use Exception;
 use App\Entity\Task;
 use App\Service\TaskService;
+use App\Utils\SerializerUtils;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -84,5 +85,20 @@ class TaskController extends AbstractController
                 'error' => $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * @Route("/api/tasks", methods={"GET"})
+     */
+    public function getAll(): JsonResponse
+    {
+        $tasks = SerializerUtils::serializeWithCircularReference(
+            $this->taskService->getAll()
+        );
+
+        return $this->json([
+            'message' => 'Tasks retrieved from the database',
+            'tasks' => $tasks
+        ]);
     }
 }
