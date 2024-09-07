@@ -17,4 +17,9 @@ class WorkerService
     {
         return $this->entityManager->getRepository(Worker::class)->find($id);
     }
+
+    public function getByName(string $name)
+    {
+        return $this->entityManager->getRepository(Worker::class)->findOneBy(['name' => $name]);
+    }
 }

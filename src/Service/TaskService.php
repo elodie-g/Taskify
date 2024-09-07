@@ -24,6 +24,15 @@ class TaskService
         return $this->entityManager->getRepository(Task::class)->findAll();
     }
 
+    public function getAllByWorkerName(string $name)
+    {
+        $worker = $this->workerService->getByName($name);
+
+        return $this->entityManager->getRepository(Task::class)->findBy([
+            'assigned_to' => $worker->getId()
+        ]);
+    }
+
     public function getById(int $id)
     {
         $task = $this->entityManager->getRepository(Task::class)->find($id);
