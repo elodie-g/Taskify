@@ -17,4 +17,9 @@ class DayService
     {
         return $this->entityManager->getRepository(Day::class)->findBy(array('id' => $ids));
     }
+
+    public function getAllByName(string $name)
+    {
+        return $this->entityManager->getRepository(Day::class)->findBy(array('name' => $name));
+    }
 }

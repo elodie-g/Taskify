@@ -124,6 +124,27 @@ class TaskController extends AbstractController
     }
 
     /**
+     * @Route("/api/tasks/day/{day}", methods={"GET"})
+     */
+    public function getAllByDay(string $day): JsonResponse
+    {
+        try {
+            $task = SerializerUtils::serializeWithCircularReference(
+                $this->taskService->getAllByDay($day)
+            );
+    
+            return $this->json([
+                'message' => 'Task retrieved from the database',
+                'task' => $task
+            ]);
+        } catch (Exception $e) {
+            return $this->json([
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
      * @Route("/api/task/{id}", methods={"GET"})
      */
     public function getById(int $id): JsonResponse

@@ -21,7 +21,26 @@ class TaskService
 
     public function getAll()
     {
-        return $this->entityManager->getRepository(Task::class)->findAll();
+        $connection = $this->entityManager->getConnection();
+
+        // $sql = "SELECT task.label, task.duration, task.frequency, worker.name, GROUP_CONCAT(day.name SEPARATOR ', ' ) as days
+        //         FROM task
+        //         INNER JOIN worker ON task.assigned_to_id = worker.id
+        //         INNER JOIN task_day ON task.id = task_day.task_id
+        //         INNER JOIN day ON task_day.day_id = day.id
+        //         GROUP BY task.id";
+
+        $sql = "SELECT task.label, task.duration, task.frequency, worker.name as worker_name, day.name as day_name
+                FROM task
+                INNER JOIN worker ON task.assigned_to_id = worker.id
+                INNER JOIN task_day ON task.id = task_day.task_id
+                INNER JOIN day ON task_day.day_id = day.id";
+
+        $stmt = $connection->prepare($sql);
+        $stmt = $stmt->executeQuery();
+        return $stmt->fetchAllAssociative();
+
+        // return $this->entityManager->getRepository(Task::class)->findAll();
     }
 
     public function getAllByWorkerName(string $name)
@@ -30,6 +49,15 @@ class TaskService
 
         return $this->entityManager->getRepository(Task::class)->findBy([
             'assigned_to' => $worker->getId()
+        ]);
+    }
+
+    public function getAllByDay(string $day)
+    {
+        $day = $this->dayService->getAllByName($day);
+
+        return $this->entityManager->getRepository(Task::class)->findBy([
+            'scheduled' => $day->getId()
         ]);
     }
 
