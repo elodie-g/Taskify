@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -26,6 +28,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\OneToMany(mappedBy: 'assigned_to', targetEntity: Task::class)]
+    private Collection $tasks;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ToDoList::class)]
+    private Collection $toDoLists;
+
+    public function __construct()
+    {
+        $this->tasks = new ArrayCollection();
+        $this->toDoLists = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -77,6 +91,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * @return Collection<int, Task>
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): static
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setAssignedTo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTask(Task $task): static
+    {
+        if ($this->tasks->removeElement($task)) {
+            // set the owning side to null (unless already changed)
+            if ($task->getAssignedTo() === $this) {
+                $task->setAssignedTo(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * @see PasswordAuthenticatedUserInterface
      */
     public function getPassword(): string
@@ -109,5 +153,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, ToDoList>
+     */
+    public function getToDoLists(): Collection
+    {
+        return $this->toDoLists;
+    }
+
+    public function addToDoList(ToDoList $toDoList): static
+    {
+        if (!$this->toDoLists->contains($toDoList)) {
+            $this->toDoLists->add($toDoList);
+            $toDoList->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeToDoList(ToDoList $toDoList): static
+    {
+        if ($this->toDoLists->removeElement($toDoList)) {
+            // set the owning side to null (unless already changed)
+            if ($toDoList->getUser() === $this) {
+                $toDoList->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

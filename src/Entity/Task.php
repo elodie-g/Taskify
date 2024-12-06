@@ -24,16 +24,17 @@ class Task
     #[ORM\Column]
     private ?float $frequency = null;
 
-    #[ORM\ManyToMany(targetEntity: Day::class, inversedBy: 'tasks')]
-    private Collection $scheduled;
-
     #[ORM\ManyToOne(inversedBy: 'tasks')]
-    private ?Worker $assigned_to = null;
+    private ?User $assigned_to = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $type = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $value = null;
 
     public function __construct()
-    {
-        $this->scheduled = new ArrayCollection();
-    }
+    {}
 
     public function getId(): ?int
     {
@@ -76,38 +77,39 @@ class Task
         return $this;
     }
 
-    /**
-     * @return Collection<int, Day>
-     */
-    public function getScheduled(): Collection
-    {
-        return $this->scheduled;
-    }
 
-    public function addScheduled(Day $scheduled): static
-    {
-        if (!$this->scheduled->contains($scheduled)) {
-            $this->scheduled->add($scheduled);
-        }
-
-        return $this;
-    }
-
-    public function removeScheduled(Day $scheduled): static
-    {
-        $this->scheduled->removeElement($scheduled);
-
-        return $this;
-    }
-
-    public function getAssignedTo(): ?Worker
+    public function getAssignedTo(): ?User
     {
         return $this->assigned_to;
     }
 
-    public function setAssignedTo(?Worker $assigned_to): static
+    public function setAssignedTo(?User $assigned_to): static
     {
         $this->assigned_to = $assigned_to;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getValue(): ?string
+    {
+        return $this->value;
+    }
+
+    public function setValue(string $value): static
+    {
+        $this->value = $value;
 
         return $this;
     }

@@ -87,20 +87,20 @@ class TaskController extends AbstractController
         }
     }
 
-    /**
-     * @Route("/api/tasks", methods={"GET"})
-     */
-    public function getAll(): JsonResponse
-    {
-        $tasks = SerializerUtils::serializeWithCircularReference(
-            $this->taskService->getAll()
-        );
+    // /**
+    //  * @Route("/api/tasks", methods={"GET"})
+    //  */
+    // public function getAll(): JsonResponse
+    // {
+    //     $tasks = SerializerUtils::serializeWithCircularReference(
+    //         $this->taskService->getAll()
+    //     );
 
-        return $this->json([
-            'message' => 'Tasks retrieved from the database',
-            'tasks' => $tasks
-        ]);
-    }
+    //     return $this->json([
+    //         'message' => 'Tasks retrieved from the database',
+    //         'tasks' => $tasks
+    //     ]);
+    // }
 
     /**
      * @Route("/api/tasks/worker/{name}", methods={"GET"})
@@ -110,27 +110,6 @@ class TaskController extends AbstractController
         try {
             $task = SerializerUtils::serializeWithCircularReference(
                 $this->taskService->getAllByWorkerName($name)
-            );
-    
-            return $this->json([
-                'message' => 'Task retrieved from the database',
-                'task' => $task
-            ]);
-        } catch (Exception $e) {
-            return $this->json([
-                'error' => $e->getMessage()
-            ]);
-        }
-    }
-
-    /**
-     * @Route("/api/tasks/day/{day}", methods={"GET"})
-     */
-    public function getAllByDay(string $day): JsonResponse
-    {
-        try {
-            $task = SerializerUtils::serializeWithCircularReference(
-                $this->taskService->getAllByDay($day)
             );
     
             return $this->json([

@@ -10,18 +10,16 @@ use Exception;
 class TaskService
 {
     private EntityManager $entityManager;
-    private DayService $dayService;
-    private WorkerService $workerService;
+    private UserService $userService;
 
     public function __construct(EntityManagerInterface $entityManager) {
         $this->entityManager = $entityManager;
-        $this->dayService = new DayService($entityManager);
-        $this->workerService = new WorkerService($entityManager);
+        $this->userService = new UserService($entityManager);
     }
 
     public function getAll()
     {
-        $connection = $this->entityManager->getConnection();
+        // $connection = $this->entityManager->getConnection();
 
         // $sql = "SELECT task.label, task.duration, task.frequency, worker.name, GROUP_CONCAT(day.name SEPARATOR ', ' ) as days
         //         FROM task
@@ -30,34 +28,26 @@ class TaskService
         //         INNER JOIN day ON task_day.day_id = day.id
         //         GROUP BY task.id";
 
-        $sql = "SELECT task.label, task.duration, task.frequency, worker.name as worker_name, day.name as day_name
-                FROM task
-                INNER JOIN worker ON task.assigned_to_id = worker.id
-                INNER JOIN task_day ON task.id = task_day.task_id
-                INNER JOIN day ON task_day.day_id = day.id";
+        // $sql = "SELECT label, duration, frequency, type, value, ";
 
-        $stmt = $connection->prepare($sql);
-        $stmt = $stmt->executeQuery();
-        return $stmt->fetchAllAssociative();
+        // $sql = "SELECT task.label, task.duration, task.frequency, username as worker_name
+        //         FROM task
+        //         INNER JOIN user ON task.assigned_to_id = user.id
+        //         INNER JOIN day ON task_day.day_id = day.id";
 
-        // return $this->entityManager->getRepository(Task::class)->findAll();
+        // $stmt = $connection->prepare($sql);
+        // $stmt = $stmt->executeQuery();
+        // return $stmt->fetchAllAssociative();
+
+        return $this->entityManager->getRepository(Task::class)->findAll();
     }
 
     public function getAllByWorkerName(string $name)
     {
-        $worker = $this->workerService->getByName($name);
+        $worker = $this->userService->getByName($name);
 
         return $this->entityManager->getRepository(Task::class)->findBy([
             'assigned_to' => $worker->getId()
-        ]);
-    }
-
-    public function getAllByDay(string $day)
-    {
-        $day = $this->dayService->getAllByName($day);
-
-        return $this->entityManager->getRepository(Task::class)->findBy([
-            'scheduled' => $day->getId()
         ]);
     }
 
@@ -77,15 +67,8 @@ class TaskService
         $task->setLabel($payload->label);
         $task->setDuration($payload->duration);
         $task->setFrequency($payload->frequency);
-        $task->getScheduled()->clear();
 
-        $days = $this->dayService->getByIds($payload->days);
-        
-        foreach ($days as $day) {
-            $task->addScheduled($day);
-        }
-
-        $worker = $this->workerService->getById($payload->workerId);
+        $worker = $this->userService->getById($payload->workerId);
         $task->setAssignedTo($worker);
 
         return $task;
