@@ -23,12 +23,14 @@ class ToDoListController extends AbstractController
     }
 
     /**
-     * @Route("/api/todo", methods={"GET"})
+     * @Route("/api/todo/", methods={"POST"})
      */
-    public function getAll(): JsonResponse
+    public function getAll(Request $request): JsonResponse
     {
+        $payload = json_decode($request->getContent(), true);
+
         $tasks = SerializerUtils::serializeWithCircularReference(
-            $this->toDoListService->getAll()
+            $this->toDoListService->getAll($payload)
         );
 
         return $this->json([

@@ -26,7 +26,7 @@ class ToDoListRepository extends ServiceEntityRepository
         $this->entityManager = $entityManager;
     }
 
-    public function findAll()
+    public function findAllBy(string $filteredQuery)
     {
         $connection = $this->entityManager->getConnection();
 
@@ -35,7 +35,9 @@ class ToDoListRepository extends ServiceEntityRepository
                 user.username
                 FROM to_do_list
                 INNER JOIN task ON to_do_list.task_id = task.id
-                INNER JOIN user ON task.assigned_to_id = user.id";
+                INNER JOIN user ON task.assigned_to_id = user.id
+                WHERE 1
+                {$filteredQuery}";
 
         $stmt = $connection->prepare($sql);
         $stmt = $stmt->executeQuery();
